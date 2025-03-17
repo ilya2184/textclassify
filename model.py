@@ -80,7 +80,6 @@ def predict_model(data, model_id):
 
 def load_model(model_id):
     if model_id in MODEL_CACHE:
-        writelog(f"Model {model_id} loaded from cache.")
         return MODEL_CACHE[model_id]
     else:
         model_path = os.path.join(MODEL_DIR, f'model_{model_id}.joblib')
