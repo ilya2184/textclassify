@@ -3,6 +3,7 @@ import os
 import Levenshtein
 from concurrent.futures import ProcessPoolExecutor
 from fuzzywuzzy import fuzz
+from app_logging import writelog
 
 
 def clean_text(text):
@@ -35,10 +36,13 @@ def compare_contacts(contacts, checklist, threshold_high=97, threshold_low=80):
     num_threads = (num_cores) // 2
     if num_threads <= 0:
         num_threads = 1
-    chunk_size = len(contacts) // num_threads + (len(contacts) % num_threads > 0)
+    contacts_len = len(contacts)
+    chunk_size = contacts_len // num_threads + (contacts_len % num_threads > 0)
 
     # Разделяем список contacts на части
-    chunks = [contacts[i:i + chunk_size] for i in range(0, len(contacts), chunk_size)]
+    chunks = [contacts[i:i + chunk_size] for i in range(0, contacts_len, chunk_size)]
+    checklist_len = len(checklist)
+    writelog(f"List1 {contacts_len} and list2 {checklist_len} comparison started in {num_threads} threads.")
 
     with ProcessPoolExecutor(max_workers=num_threads) as executor:
         futures = []
