@@ -2,15 +2,14 @@ import re
 import os
 import Levenshtein
 from concurrent.futures import ProcessPoolExecutor
-from fuzzywuzzy import fuzz
+from rapidfuzz import fuzz
 from app_logging import writelog
 
 
 def clean_text(text):
-    # Заменить все символы, кроме русских букв, английских букв и цифр, на пробел
     text = re.sub(r'[^a-zA-Zа-яА-Я0-9]', ' ', text)
-    # Удалить повторяющиеся пробелы
     text = re.sub(r'\s+', ' ', text).strip()
+    text = text.upper()    
     return text
 
 def compare_single_contact(contact, checklist, threshold_high, threshold_low):
