@@ -2,24 +2,29 @@ import re
 import os
 import Levenshtein
 from concurrent.futures import ProcessPoolExecutor
-from rapidfuzz import fuzz
+from rapidfuzz import fuzz, utils
 from app_logging import writelog
 
 
 def clean_text(text):
-    text = re.sub(r'[^a-zA-Zа-яА-Я0-9]', ' ', text)
-    text = re.sub(r'\s+', ' ', text).strip()
-    text = text.upper()    
+    text = utils.default_process(text)
     return text
 
 def compare_single_contact(contact, checklist, threshold_high, threshold_low):
-    contact_name = clean_text(contact["name"])
+    contact_name = contact["name"]
+    contact_name_cleaned = clean_text(contact_name)
     matches_high = []
     matches_low = []
 
+    if contact_name_cleaned == '':
+        return contact_name, matches_high, matches_low
+    
     for item in checklist:
-        checklist_name = clean_text(item["name"])
-        score = fuzz.token_sort_ratio(contact_name, checklist_name)
+        checklist_name = item["name"]
+        checklist_name_cleaned = clean_text(checklist_name)
+        if checklist_name_cleaned == '':
+            continue
+        score = fuzz.token_sort_ratio(contact_name_cleaned, checklist_name_cleaned)
         if score >= threshold_high:
             matches_high.append((checklist_name, score))
         elif score >= threshold_low:
