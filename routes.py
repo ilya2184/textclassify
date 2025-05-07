@@ -21,7 +21,8 @@ def setup_routes(app):
         data = pd.read_excel(request.files['file'])
         model_id = request.form['model_id']
         train_model(data, model_id)
-        return jsonify({"message": "Model trained successfully."})
+        accuracy = test_model(data, model_id)
+        return jsonify({"message": accuracy})
 
     @app.route('/test', methods=['POST'])
     def test():
